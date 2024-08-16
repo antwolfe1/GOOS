@@ -58,7 +58,6 @@ public class FakeAuctionServer {
         chatManager.addIncomingListener(new IncomingChatMessageListener() {
             @Override
             public void newIncomingMessage(EntityBareJid entityBareJid, Message message, Chat chat) {
-                System.out.println(message.getBody());
                 messageListener.processMessage(message);
             }
         });
@@ -83,18 +82,12 @@ public class FakeAuctionServer {
 
     public static class SingleMessageListener {
         private final ArrayBlockingQueue<Message> messages = new ArrayBlockingQueue<>(1);
-        private final ArrayList<Message> messageArrayList = new ArrayList<>();
 
         public void processMessage(Message message) {
-            System.out.println(message);
             messages.add(message);
-            System.out.println(messages);
-//            messageArrayList.add(message);
         }
 
         public void receivesAMessage() throws InterruptedException {
-            System.out.println("receivesAMsg: " + messages);
-//            System.out.println(messageArrayList);
             assertThat("Message", messages.poll(5, TimeUnit.SECONDS), is(notNullValue()));
         }
 

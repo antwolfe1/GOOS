@@ -7,7 +7,9 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
+import org.jivesoftware.smack.chat2.OutgoingChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.MessageBuilder;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jxmpp.jid.EntityBareJid;
@@ -47,18 +49,20 @@ public class Main {
         ChatManager chatManager = ChatManager.getInstanceFor(connection);
         EntityBareJid jid = JidCreate.entityBareFrom(auctionId(itemId, connection));
         Chat chat = chatManager.chatWith(jid);
-        chatManager.addIncomingListener(new IncomingChatMessageListener() {
+        chatManager.addOutgoingListener(new OutgoingChatMessageListener() {
             @Override
-            public void newIncomingMessage(EntityBareJid entityBareJid, Message message, Chat chat) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        ui.showStatus(MainWindow.STATUS_LOST);
-                    }
-                });
+            public void newOutgoingMessage(EntityBareJid entityBareJid, MessageBuilder messageBuilder, Chat chat) {
+                SwingUtilities.invokeLater(() -> ui.showStatus(MainWindow.STATUS_LOST));
             }
         });
-        chat.send("hello");
+//        chatManager.addIncomingListener(new IncomingChatMessageListener() {
+//            @Override
+//            public void newIncomingMessage(EntityBareJid entityBareJid, Message message, Chat chat) {
+//                System.out.println(message + "" + chat);
+//                SwingUtilities.invokeLater(() -> ui.showStatus(MainWindow.STATUS_LOST));
+//            }
+//        });
+        chat.send("Lost");
         this.notToBeGCd = chat;
     }
 
