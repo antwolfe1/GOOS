@@ -1,6 +1,8 @@
 package book.growingOOP;
+import book.growingOOP.ui.MainWindow;
 
 public class ApplicationRunner {
+    public static final String XMPP_HOSTNAME = "localhost";
     public static final String SNIPER_ID = "sniper";
     public static final String SNIPER_PASSWORD = "sniper";
     private AuctionSniperDriver driver;
@@ -10,7 +12,7 @@ public class ApplicationRunner {
             @Override
             public void run() {
                 try{
-                    Main.main(XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, auction.getItemId());
+                    Main.main(new String[] {XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, auction.getItemId()});
                 } catch (Exception e){
                     e.printStackTrace();
                 }
@@ -20,12 +22,12 @@ public class ApplicationRunner {
         thread.start();
 
         driver = new AuctionSniperDriver(1000);
-        driver.showsSniperStatus(STATUS_JOINING);
+        driver.showsSniperStatus(MainWindow.STATUS_JOINING);
 
     }
 
     public void showsSniperHasLostAuction(){
-        driver.showsSniperStatus(STATUS_LOST);
+        driver.showsSniperStatus(MainWindow.STATUS_LOST);
 
     }
 

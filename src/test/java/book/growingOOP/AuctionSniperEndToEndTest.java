@@ -3,18 +3,17 @@ package book.growingOOP;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+
 public class AuctionSniperEndToEndTest {
     private final FakeAuctionServer auction = new FakeAuctionServer("item-54321");
     private final ApplicationRunner application = new ApplicationRunner();
+
     // Additional Cleanup
     @AfterEach
-    public void stopAuction () {
+    public void stopAuctionAndApplication() {
         auction.stop();
-    }
-
-    @AfterEach
-    public void stopApplication () {
         application.stop();
+    }
 
     @Test
     public void sniperJoinsAuctionUntilAuctionCloses() throws Exception {
@@ -32,7 +31,7 @@ public class AuctionSniperEndToEndTest {
         // Step 4
         application.showsSniperHasLostAuction();
 
-        }
+
     }
 
 

@@ -22,12 +22,36 @@
       <version>RELEASE</version>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>com.googlecode.windowlicker</groupId>
       <artifactId>windowlicker-swing</artifactId>
       <version>r268</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.igniterealtime.smack</groupId>
+      <artifactId>smack-java8</artifactId>
+      <version>4.4.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.igniterealtime.smack</groupId>
+      <artifactId>smack-tcp</artifactId>
+      <version>4.4.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.igniterealtime.smack</groupId>
+      <artifactId>smack-im</artifactId>
+      <version>4.4.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.igniterealtime.smack</groupId>
+      <artifactId>smack-extensions</artifactId>
+      <version>4.4.0</version>
+    </dependency>
 
   </dependencies>
 </project>
