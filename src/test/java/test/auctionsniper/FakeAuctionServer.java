@@ -9,6 +9,7 @@ import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.sasl.SASLMechanism;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jxmpp.jid.EntityBareJid;
@@ -38,7 +39,9 @@ public class FakeAuctionServer {
 
     {
         try {
-            config = XMPPTCPConnectionConfiguration.builder().setXmppDomain(XMPP_HOSTNAME).setHost(XMPP_HOSTNAME).setResource(AUCTION_RESOURCE).setPort(5222).addEnabledSaslMechanism("PLAIN").setSecurityMode(ConnectionConfiguration.SecurityMode.disabled).build();
+            config = XMPPTCPConnectionConfiguration.builder().
+                    setXmppDomain(XMPP_HOSTNAME).setHost(XMPP_HOSTNAME).setResource(AUCTION_RESOURCE).setPort(5222)
+                    .addEnabledSaslMechanism(SASLMechanism.PLAIN).setSecurityMode(ConnectionConfiguration.SecurityMode.disabled).build();
         } catch (XmppStringprepException e) {
             throw new RuntimeException(e);
         }
@@ -90,7 +93,8 @@ public class FakeAuctionServer {
 
 
     public void announceClosed() throws SmackException.NotConnectedException, InterruptedException {
-        currentChat.send("Auction is Closed");
+        System.out.println(currentChat.getXmppAddressOfChatPartner());
+        currentChat.send("SOL Version: 1.1; Event: CLOSE;");
     }
 
     public void stop() {

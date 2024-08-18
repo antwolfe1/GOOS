@@ -14,7 +14,11 @@ public class AuctionSniperDriver extends JFrameDriver {
 
     // find a top-level window within timeout
     public AuctionSniperDriver(int timeoutMillis) {
-        super(new GesturePerformer(), JFrameDriver.topLevelFrame(named(Main.MAIN_WINDOW_NAME), showingOnScreen()), new AWTEventQueueProber(timeoutMillis, 100));
+        super(new GesturePerformer(),
+                JFrameDriver.topLevelFrame(
+                        named(MainWindow.MAIN_WINDOW_NAME),
+                        showingOnScreen()),
+                new AWTEventQueueProber(timeoutMillis, 100));
     }
 
     // compares label string in window with expected string. throws exception if different
