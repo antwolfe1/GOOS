@@ -10,6 +10,7 @@ import org.jxmpp.jid.EntityBareJid;
 import java.util.HashMap;
 
 public class AuctionMessageTranslator implements OutgoingChatMessageListener, IncomingChatMessageListener {
+
     private final AuctionEventListener listener;
 
     public AuctionMessageTranslator(AuctionEventListener listener) {
@@ -18,12 +19,12 @@ public class AuctionMessageTranslator implements OutgoingChatMessageListener, In
 
     public void processMessage(Chat chat, Message message) {
         HashMap<String, String> event = unpackEventFrom(message);
-        System.out.println(event);
         String type = event.get("Event");
         if ("CLOSE".equals(type)) {
             listener.auctionClosed();
         } else if ("PRICE".equals(type)) {
-            listener.currentPrice((Integer.parseInt(event.get("CurrentPrice"))), (Integer.parseInt(event.get("Increment"))));
+            listener.currentPrice((Integer.parseInt(event.get("CurrentPrice"))),
+                    (Integer.parseInt(event.get("Increment"))));
         }
     }
 
@@ -38,13 +39,12 @@ public class AuctionMessageTranslator implements OutgoingChatMessageListener, In
 
     @Override
     public void newIncomingMessage(EntityBareJid entityBareJid, Message message, Chat chat) {
-
+        processMessage(chat, message);
     }
 
     @Override
     public void newOutgoingMessage(EntityBareJid entityBareJid, MessageBuilder messageBuilder, Chat chat) {
-//        System.out.println(messageBuilder.build().getBody());
-//        processMessage(chat, messageBuilder.build());
-        listener.auctionClosed();
+        processMessage(chat, messageBuilder.build());
+
     }
 }

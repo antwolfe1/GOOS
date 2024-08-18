@@ -93,7 +93,6 @@ public class FakeAuctionServer {
 
 
     public void announceClosed() throws SmackException.NotConnectedException, InterruptedException {
-        System.out.println(currentChat.getXmppAddressOfChatPartner());
         currentChat.send("SOL Version: 1.1; Event: CLOSE;");
     }
 
