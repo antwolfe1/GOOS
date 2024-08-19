@@ -19,7 +19,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 
 
-public class Main implements SniperListener {
+public class Main {
     private static final int ARG_HOSTNAME = 0;
     private static final int ARG_USERNAME = 1;
     private static final int ARG_PASSWORD = 2;
@@ -40,6 +40,10 @@ public class Main implements SniperListener {
         startUserInterface();
     }
 
+    private void startUserInterface() throws Exception {
+        SwingUtilities.invokeAndWait(() -> ui = new MainWindow());
+    }
+
     public static void main(String[] args) throws Exception {
         Main main = new Main();
         main.joinAuction(connectTo(args[ARG_HOSTNAME], args[ARG_USERNAME], args[ARG_PASSWORD]), args[ARG_ITEM_ID]);
@@ -47,31 +51,22 @@ public class Main implements SniperListener {
 
 
     private void joinAuction(XMPPTCPConnection connection, String itemId)
-            throws XmppStringprepException, SmackException.NotConnectedException, InterruptedException {
+            throws XmppStringprepException {
 
         disconnectWhenUICloses(connection);
         ChatManager chatManager = ChatManager.getInstanceFor(connection);
         EntityBareJid jid = JidCreate.entityBareFrom(auctionId(itemId, connection));
-        Chat chat = chatManager.chatWith(jid);
+        final Chat chat = chatManager.chatWith(jid);
         this.notToBeGCd = chat;
 
-        Auction auction = new Auction() {
-            @Override
-            public void bid(int amount) {
-                try {
-                    chat.send(String.format(BID_COMMAND_FORMAT, amount));
-                } catch (InterruptedException | SmackException.NotConnectedException e ) {
-                    e.printStackTrace();
-                }
-            }
-        };
+        Auction auction = new XMPPAuction(chat);
 
-        chatManager.addOutgoingListener(new AuctionMessageTranslator(new AuctionSniper(auction, this)));
-        chatManager.addIncomingListener(new AuctionMessageTranslator(new AuctionSniper(auction, this)));
+        chatManager.addOutgoingListener(new AuctionMessageTranslator(new AuctionSniper(auction, new SniperStateDisplayer())));
+        chatManager.addIncomingListener(new AuctionMessageTranslator(new AuctionSniper(auction, new SniperStateDisplayer())));
 
-        chat.send(JOIN_COMMAND_FORMAT);
+        auction.join();
+
     }
-
 
 
     private static String auctionId(String itemId, XMPPTCPConnection connection) {
@@ -103,19 +98,20 @@ public class Main implements SniperListener {
         });
     }
 
-    private void startUserInterface() throws Exception {
-        SwingUtilities.invokeAndWait(() -> ui = new MainWindow());
-    }
 
+    private class SniperStateDisplayer implements SniperListener {
+        @Override
+        public void sniperLost() {
+            showStatus(MainWindow.STATUS_LOST);
+        }
 
-    @Override
-    public void sniperLost() {
-        SwingUtilities.invokeLater(() -> ui.showStatus(MainWindow.STATUS_LOST));
-    }
+        @Override
+        public void sniperBidding() {
+            showStatus(MainWindow.STATUS_BIDDING);
+        }
 
-    @Override
-    public void sniperBidding() {
-        SwingUtilities.invokeLater(() -> ui.showStatus(MainWindow.STATUS_BIDDING));
-
+        private void showStatus(final String status) {
+            SwingUtilities.invokeLater(() -> ui.showStatus(status));
+        }
     }
 }
