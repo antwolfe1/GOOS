@@ -20,17 +20,15 @@ import java.io.IOException;
 
 
 public class Main {
+    public static final String ITEM_AS_ID_LOGIN = "auction-%s";
+    public static final String JOIN_COMMAND_FORMAT = "SOLVersion: 1.1; Command: JOIN;";
+    public static final String BID_COMMAND_FORMAT = "SOLVersion: 1.1; Command: BID; Price: %d;";
     private static final int ARG_HOSTNAME = 0;
     private static final int ARG_USERNAME = 1;
     private static final int ARG_PASSWORD = 2;
     private static final int ARG_ITEM_ID = 3;
-
     private static final String AUCTION_RESOURCE = "Auction";
-    public static final String ITEM_AS_ID_LOGIN = "auction-%s";
     public static final String AUCTION_ID_FORMAT = ITEM_AS_ID_LOGIN + "@%s/" + AUCTION_RESOURCE;
-    public static final String JOIN_COMMAND_FORMAT = "SOLVersion: 1.1; Command: JOIN;";
-    public static final String BID_COMMAND_FORMAT = "SOLVersion: 1.1; Command: BID; Price: %d;";
-
     private MainWindow ui;
     @SuppressWarnings("unused")
     private Chat notToBeGCd;
@@ -40,34 +38,10 @@ public class Main {
         startUserInterface();
     }
 
-    private void startUserInterface() throws Exception {
-        SwingUtilities.invokeAndWait(() -> ui = new MainWindow());
-    }
-
     public static void main(String[] args) throws Exception {
         Main main = new Main();
         main.joinAuction(connectTo(args[ARG_HOSTNAME], args[ARG_USERNAME], args[ARG_PASSWORD]), args[ARG_ITEM_ID]);
     }
-
-
-    private void joinAuction(XMPPTCPConnection connection, String itemId)
-            throws XmppStringprepException {
-
-        disconnectWhenUICloses(connection);
-        ChatManager chatManager = ChatManager.getInstanceFor(connection);
-        EntityBareJid jid = JidCreate.entityBareFrom(auctionId(itemId, connection));
-        final Chat chat = chatManager.chatWith(jid);
-        this.notToBeGCd = chat;
-
-        Auction auction = new XMPPAuction(chat);
-
-        chatManager.addOutgoingListener(new AuctionMessageTranslator(new AuctionSniper(auction, new SniperStateDisplayer())));
-        chatManager.addIncomingListener(new AuctionMessageTranslator(new AuctionSniper(auction, new SniperStateDisplayer())));
-
-        auction.join();
-
-    }
-
 
     private static String auctionId(String itemId, XMPPTCPConnection connection) {
         return String.format(AUCTION_ID_FORMAT, itemId, connection.getXMPPServiceDomain());
@@ -87,6 +61,28 @@ public class Main {
             e.printStackTrace();
         }
         return connection;
+    }
+
+    private void startUserInterface() throws Exception {
+        SwingUtilities.invokeAndWait(() -> ui = new MainWindow());
+    }
+
+    private void joinAuction(XMPPTCPConnection connection, String itemId)
+            throws XmppStringprepException {
+
+        disconnectWhenUICloses(connection);
+        ChatManager chatManager = ChatManager.getInstanceFor(connection);
+        EntityBareJid jid = JidCreate.entityBareFrom(auctionId(itemId, connection));
+        final Chat chat = chatManager.chatWith(jid);
+        this.notToBeGCd = chat;
+
+        Auction auction = new XMPPAuction(chat);
+
+        chatManager.addOutgoingListener(new AuctionMessageTranslator(connection.getUser().toString(), new AuctionSniper(auction, new SniperStateDisplayer())));
+        chatManager.addIncomingListener(new AuctionMessageTranslator(connection.getUser().toString(), new AuctionSniper(auction, new SniperStateDisplayer())));
+
+        auction.join();
+
     }
 
     private void disconnectWhenUICloses(final XMPPTCPConnection connection) {
@@ -109,6 +105,12 @@ public class Main {
         public void sniperBidding() {
             showStatus(MainWindow.STATUS_BIDDING);
         }
+
+        @Override
+        public void sniperWinning() { showStatus(MainWindow.STATUS_WINNING); }
+
+        @Override
+        public void sniperWon() { showStatus(MainWindow.STATUS_WON); }
 
         private void showStatus(final String status) {
             SwingUtilities.invokeLater(() -> ui.showStatus(status));
