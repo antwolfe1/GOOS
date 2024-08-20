@@ -1,6 +1,5 @@
 package auctionsniper;
 
-import auctionsniper.ui.MainWindow;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
@@ -78,8 +77,8 @@ public class Main {
 
         Auction auction = new XMPPAuction(chat);
 
-        chatManager.addOutgoingListener(new AuctionMessageTranslator(connection.getUser().toString(), new AuctionSniper(auction, new SniperStateDisplayer())));
-        chatManager.addIncomingListener(new AuctionMessageTranslator(connection.getUser().toString(), new AuctionSniper(auction, new SniperStateDisplayer())));
+        chatManager.addOutgoingListener(new AuctionMessageTranslator(connection.getUser().toString(), new AuctionSniper(itemId, auction, new SniperStateDisplayer())));
+        chatManager.addIncomingListener(new AuctionMessageTranslator(connection.getUser().toString(), new AuctionSniper(itemId, auction, new SniperStateDisplayer())));
 
         auction.join();
 
@@ -100,9 +99,14 @@ public class Main {
         public void sniperLost() {
             showStatus(MainWindow.STATUS_LOST);
         }
-
+//
+//        @Override
+//        public void sniperBidding(final SniperState sniperState) {
+//            ui.sniperStatusChanged(state, MainWindow.STATUS_BIDDING);
+//        }
+//
         @Override
-        public void sniperBidding() {
+        public void sniperBidding(final SniperState sniperState) {
             showStatus(MainWindow.STATUS_BIDDING);
         }
 
@@ -113,7 +117,7 @@ public class Main {
         public void sniperWon() { showStatus(MainWindow.STATUS_WON); }
 
         private void showStatus(final String status) {
-            SwingUtilities.invokeLater(() -> ui.showStatus(status));
+            SwingUtilities.invokeLater(() -> ui.showStatusText(status));
         }
     }
 }

@@ -24,10 +24,12 @@
     </dependency>
 
     <dependency>
-      <groupId>com.googlecode.windowlicker</groupId>
-      <artifactId>windowlicker-swing</artifactId>
-      <version>r268</version>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-junit5</artifactId>
+      <version>RELEASE</version>
+      <scope>test</scope>
     </dependency>
+
 
     <dependency>
       <groupId>org.igniterealtime.smack</groupId>
@@ -53,13 +55,12 @@
       <version>RELEASE</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-junit5</artifactId>
-      <version>2.13.1</version>
-      <scope>test</scope>
-    </dependency>
 
+    <dependency>
+      <groupId>com.googlecode.windowlicker</groupId>
+      <artifactId>windowlicker-swing</artifactId>
+      <version>RELEASE</version>
+    </dependency>
 
   </dependencies>
 </project>
